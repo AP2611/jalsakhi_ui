@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const Architecture = () => {
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
     const diagrams = [
         {
             title: "User Flow Journey",
@@ -56,7 +58,10 @@ const Architecture = () => {
                             transition={{ delay: index * 0.1 }}
                             className="group relative bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-4 border border-slate-200 dark:border-slate-700 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300"
                         >
-                            <div className="relative overflow-hidden rounded-2xl mb-6 bg-slate-200 dark:bg-slate-700 aspect-[4/3]">
+                            <div 
+                                className="relative overflow-hidden rounded-2xl mb-6 bg-slate-200 dark:bg-slate-700 aspect-[4/3] cursor-pointer"
+                                onClick={() => setSelectedImage(diagram.image)}
+                            >
                                 <img
                                     src={diagram.image}
                                     alt={diagram.title}
@@ -66,6 +71,11 @@ const Architecture = () => {
                                     <span className="px-3 py-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full text-xs font-semibold text-emerald-600 dark:text-emerald-400 shadow-sm">
                                         {diagram.tag}
                                     </span>
+                                </div>
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-full">
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-white">Click to Enlarge</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -77,17 +87,15 @@ const Architecture = () => {
                                     {diagram.description}
                                 </p>
 
-                                <a
-                                    href={diagram.image}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <button
+                                    onClick={() => setSelectedImage(diagram.image)}
                                     className="inline-flex items-center text-emerald-500 font-semibold text-sm group/btn"
                                 >
                                     View Full Diagram
                                     <svg className="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
-                                </a>
+                                </button>
                             </div>
                         </motion.div>
                     ))}
@@ -136,8 +144,42 @@ const Architecture = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Full-size Image Modal */}
+            {selectedImage && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <motion.div
+                        initial={{ scale: 0.9 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0.9 }}
+                        className="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setSelectedImage(null)}
+                            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-3 transition-colors"
+                        >
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <img
+                            src={selectedImage}
+                            alt="Full size diagram"
+                            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                        />
+                    </motion.div>
+                </motion.div>
+            )}
         </section>
     );
 };
 
 export default Architecture;
+
